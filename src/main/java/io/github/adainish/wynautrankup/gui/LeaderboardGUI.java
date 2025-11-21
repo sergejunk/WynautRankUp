@@ -28,7 +28,6 @@ import io.github.adainish.wynautrankup.util.Util;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.component.ItemLore;
 
@@ -50,7 +49,6 @@ public class LeaderboardGUI {
                 String playerName = Util.getPlayerName(entry.playerId());
                 boolean isViewer = entry.playerId().equals(viewerId.toString());
                 ItemStack icon = Util.getPlayerHead(playerName, UUID.fromString(entry.playerId()));
-                if (icon == null) icon = new ItemStack(Items.PAPER);
 
                 String displayName = (isViewer ? "§a" : "§e") + "#" + rank + " §f" + playerName + " §7- §b" + entry.elo();
                 List<Component> lore = List.of(
@@ -76,7 +74,6 @@ public class LeaderboardGUI {
             // Add "Your Position" button in the last slot
             if (selfEntry != null) {
                 ItemStack selfIcon = Util.getPlayerHead(player.getName().getString(), viewerId);
-                if (selfIcon == null) selfIcon = new ItemStack(Items.PLAYER_HEAD);
                 String selfDisplay = "§bYour Position: §a#" + selfRank + " §f" + player.getName().getString() + " §7- §b" + selfEntry.elo();
                 List<Component> selfLore = List.of(
                         Component.literal("§7Ranked: §e" + selfRank),

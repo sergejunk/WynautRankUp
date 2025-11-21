@@ -29,10 +29,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -53,7 +51,6 @@ public class TeamValidator {
                 System.out.println("[DEBUG] Team is null.");
             }
             System.out.println("[DEBUG] Team is null, not 6 Pokémon, or config is missing.");
-            isLegal = false;
             return isLegal;
         }
         for (Pokemon p : team)
@@ -83,9 +80,7 @@ public class TeamValidator {
             reasons.add("Validation config is not set up by admins. Please contact them.");
             return reasons;
         }
-        team.forEach(p -> {
-            config.bannedPokemon.stream().map(rule -> getIllegalityReasons(p, rule)).forEach(reasons::addAll);
-        });
+        team.forEach(p -> config.bannedPokemon.stream().map(rule -> getIllegalityReasons(p, rule)).forEach(reasons::addAll));
         return reasons;
     }
 
@@ -216,9 +211,9 @@ public class TeamValidator {
         }
         for (BannedPokemonRule rule : config.bannedPokemon) {
             if (rule.species == null) continue; // Species is required to create a Pokemon instance
-            if (PokemonSpecies.INSTANCE.getByName(rule.species) == null)
+            if (PokemonSpecies.getByName(rule.species) == null)
                 continue;
-            Pokemon pokemon = PokemonSpecies.INSTANCE.getByName(rule.species).create(100);
+            Pokemon pokemon = PokemonSpecies.getByName(rule.species).create(100);
             StringBuilder lore = new StringBuilder();
             if (rule.form != null && !rule.form.isEmpty()) {
                 String capForm = rule.form.substring(0, 1).toUpperCase() + rule.form.substring(1);

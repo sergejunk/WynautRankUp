@@ -102,7 +102,7 @@ public class SeasonInfoGUI {
         GooeyButton backButton = GooeyButton.builder()
                 .display(new ItemStack(Items.SPECTRAL_ARROW))
                 .with(DataComponents.CUSTOM_NAME, Component.literal("§eBack to Seasons"))
-                .with(DataComponents.LORE, new ItemLore(Util.formattedComponentList(Arrays.asList("&7Click to return to the Seasons menu"))))
+                .with(DataComponents.LORE, new ItemLore(Util.formattedComponentList(List.of("&7Click to return to the Seasons menu"))))
                 .onClick(b -> {
                     SeasonsGUI seasonsGUI = new SeasonsGUI();
                     seasonsGUI.open(player);

@@ -19,13 +19,11 @@ package io.github.adainish.wynautrankup.tracker;
 import io.github.adainish.wynautrankup.WynautRankUp;
 import io.github.adainish.wynautrankup.data.Match;
 import io.github.adainish.wynautrankup.util.EloCalculator;
-import io.github.adainish.wynautrankup.util.Location;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -86,8 +84,8 @@ public class RankedBattleTracker
     public void rankedBattleEnded(Match match, UUID uuid, UUID winnerId)
     {
         boolean isRepeatOpponent = isRepeatOpponent(match.getPlayer1().getId(), match.getPlayer2().getId());
-        int winnerElo = 0;
-        int loserElo = 0;
+        int winnerElo;
+        int loserElo;
         try {
             winnerElo = WynautRankUp.instance.playerDataManager.getElo(winnerId).get();
             loserElo = WynautRankUp.instance.playerDataManager.getElo(uuid).get();

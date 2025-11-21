@@ -77,7 +77,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation("com.cobblemon:fabric:1.6.0+1.21.1-SNAPSHOT")
+    modImplementation("com.cobblemon:fabric:1.7.0+1.21.1-SNAPSHOT")
     implementation "org.mongodb:mongodb-driver-core:4.10.2"
     implementation "org.mongodb:mongodb-driver-sync:4.10.2"
     modImplementation 'ca.landonjw.gooeylibs:fabric-api-repack:3.1.0-1.21.1-SNAPSHOT'

@@ -61,11 +61,11 @@ public class BannedPokemonRule {
 
             switch (key) {
                 case "species":
-                    if (PokemonSpecies.INSTANCE.getByIdentifier(ResourceLocation.parse("cobblemon:" + value)) == null) {
+                    if (PokemonSpecies.getByIdentifier(ResourceLocation.parse("cobblemon:" + value)) == null) {
                         errors.add("Unknown species: '" + value + "' in rule: '" + ruleStr + "'");
                     }
                     rule.species = value;
-                    species = PokemonSpecies.INSTANCE.getByIdentifier(ResourceLocation.parse("cobblemon:" + value));
+                    species = PokemonSpecies.getByIdentifier(ResourceLocation.parse("cobblemon:" + value));
                     break;
                 case "form":
                     if (value.isEmpty()) {
@@ -93,7 +93,7 @@ public class BannedPokemonRule {
                         errors.add("Warning: empty value for 'moves' in rule: '" + ruleStr + "'");
                         break;
                     }
-                    species = PokemonSpecies.INSTANCE.getByIdentifier(ResourceLocation.parse("cobblemon:" + rule.species));
+                    species = PokemonSpecies.getByIdentifier(ResourceLocation.parse("cobblemon:" + rule.species));
                     if (species == null) {
                         errors.add("Species must be defined before moves in rule: '" + ruleStr + "'");
                         break;

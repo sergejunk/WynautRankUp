@@ -19,12 +19,10 @@ package io.github.adainish.wynautrankup.cmd;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.adainish.wynautrankup.WynautRankUp;
 import io.github.adainish.wynautrankup.arenas.Arena;
 import io.github.adainish.wynautrankup.util.Location;
 import io.github.adainish.wynautrankup.util.PermissionUtil;
-import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -234,7 +232,6 @@ public class ArenaCommand {
                                                                 Component.literal("§aTeleport to position " + (finalI + 1))
                                                         ))
                                                 );
-                                        ;
                                         message = message.copy().append(posComponent).append(Component.literal(" "));
                                     }
                                     Component finalMessage = message;

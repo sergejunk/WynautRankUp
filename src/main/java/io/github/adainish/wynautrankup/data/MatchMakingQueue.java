@@ -17,6 +17,7 @@
 package io.github.adainish.wynautrankup.data;
 
 import com.cobblemon.mod.common.Cobblemon;
+import com.cobblemon.mod.common.battles.BattleRegistry;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import io.github.adainish.wynautrankup.WynautRankUp;
 import io.github.adainish.wynautrankup.arenas.Arena;
@@ -76,9 +77,7 @@ public class MatchMakingQueue
             queue.remove(playerId);
         }
         //send message to player
-        PermissionUtil.getOptionalServerPlayer(playerId).ifPresent(player -> {
-            player.sendSystemMessage(Component.literal("You have left the ranked queue.").withStyle(s -> s.withColor(0xFF5555)));
-        });
+        PermissionUtil.getOptionalServerPlayer(playerId).ifPresent(player -> player.sendSystemMessage(Component.literal("You have left the ranked queue.").withStyle(s -> s.withColor(0xFF5555))));
     }
 
     /**
@@ -135,12 +134,8 @@ public class MatchMakingQueue
                 PermissionUtil.getOptionalServerPlayer(match.getPlayer2().getId()).isEmpty()) {
             //one or both players are offline, do not start the match
             //notify the online player if applicable
-            PermissionUtil.getOptionalServerPlayer(match.getPlayer1().getId()).ifPresent(player -> {
-                player.sendSystemMessage(Component.literal("Your opponent has gone offline. Match cancelled.").withStyle(s -> s.withColor(0xFF5555)));
-            });
-            PermissionUtil.getOptionalServerPlayer(match.getPlayer2().getId()).ifPresent(player -> {
-                player.sendSystemMessage(Component.literal("Your opponent has gone offline. Match cancelled.").withStyle(s -> s.withColor(0xFF5555)));
-            });
+            PermissionUtil.getOptionalServerPlayer(match.getPlayer1().getId()).ifPresent(player -> player.sendSystemMessage(Component.literal("Your opponent has gone offline. Match cancelled.").withStyle(s -> s.withColor(0xFF5555))));
+            PermissionUtil.getOptionalServerPlayer(match.getPlayer2().getId()).ifPresent(player -> player.sendSystemMessage(Component.literal("Your opponent has gone offline. Match cancelled.").withStyle(s -> s.withColor(0xFF5555))));
             return;
         }
 
@@ -154,9 +149,7 @@ public class MatchMakingQueue
         if (!WynautRankUp.instance.teamValidator.doTeamsMatch(entry1.getPlayer(), team1)) {
             PermissionUtil.getOptionalServerPlayer(entry1.getPlayer().getId()).ifPresent(player -> {
                 player.sendSystemMessage(Component.literal("Your team has changed since you entered the queue. Please rejoin the queue with your new team.").withStyle(s -> s.withColor(0xFF5555)));
-                WynautRankUp.instance.teamValidator.getTeamMismatchReasons(entry1.getPlayer(), team1).forEach(reason -> {
-                    player.sendSystemMessage(Component.literal("- " + reason).withStyle(s -> s.withColor(0xFF5555)));
-                });
+                WynautRankUp.instance.teamValidator.getTeamMismatchReasons(entry1.getPlayer(), team1).forEach(reason -> player.sendSystemMessage(Component.literal("- " + reason).withStyle(s -> s.withColor(0xFF5555))));
                 player.sendSystemMessage(Component.literal("Please rejoin the queue with a legal team and do not change your team while in queue.").withStyle(s -> s.withColor(0xFF5555)));
                 queue.remove(entry1.getPlayer().getId());
                 entry2.getPlayer().getOptionalServerPlayer().ifPresent(p ->
@@ -170,9 +163,7 @@ public class MatchMakingQueue
         if (!WynautRankUp.instance.teamValidator.doTeamsMatch(entry2.getPlayer(), team2)) {
             PermissionUtil.getOptionalServerPlayer(entry2.getPlayer().getId()).ifPresent(player -> {
                 player.sendSystemMessage(Component.literal("Your team has changed since you entered the queue. Please rejoin the queue with your new team.").withStyle(s -> s.withColor(0xFF5555)));
-                WynautRankUp.instance.teamValidator.getTeamMismatchReasons(entry2.getPlayer(), team2).forEach(reason -> {
-                    player.sendSystemMessage(Component.literal("- " + reason).withStyle(s -> s.withColor(0xFF5555)));
-                });
+                WynautRankUp.instance.teamValidator.getTeamMismatchReasons(entry2.getPlayer(), team2).forEach(reason -> player.sendSystemMessage(Component.literal("- " + reason).withStyle(s -> s.withColor(0xFF5555))));
                 player.sendSystemMessage(Component.literal("Please rejoin the queue with a legal team and do not change your team while in queue.").withStyle(s -> s.withColor(0xFF5555)));
                 queue.remove(entry2.getPlayer().getId());
                 entry1.getPlayer().getOptionalServerPlayer().ifPresent(p ->
@@ -283,7 +274,7 @@ public class MatchMakingQueue
             if (availableArena == null) return Optional.empty();
             List<PlayerQueueEntry> sortedEntries = queue.values().stream()
                     .sorted(Comparator.comparingInt(e -> e.getPlayer().getElo()))
-                    .collect(Collectors.toList());
+                    .toList();
 
             List<AbstractMap.SimpleEntry<PlayerQueueEntry, PlayerQueueEntry>> candidates = new ArrayList<>();
             for (int i = 0; i < sortedEntries.size(); i++) {
@@ -317,7 +308,7 @@ public class MatchMakingQueue
                     return Optional.empty();
                 }
 
-                if (Cobblemon.INSTANCE.getBattleRegistry().getBattleByParticipatingPlayerId(playerId) != null) {
+                if (BattleRegistry.getBattleByParticipatingPlayerId(playerId) != null) {
                     queue.remove(playerId);
                     optionalPlayer.ifPresent(player ->
                             player.sendSystemMessage(Component.literal("You have been removed from the ranked queue because you are already in a battle.").withStyle(s -> s.withColor(0xFF5555)))

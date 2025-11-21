@@ -18,6 +18,7 @@ package io.github.adainish.wynautrankup.data;
 
 import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
+import com.cobblemon.mod.common.battles.BattleRegistry;
 import io.github.adainish.wynautrankup.WynautRankUp;
 import io.github.adainish.wynautrankup.util.BattleUtil;
 import io.github.adainish.wynautrankup.arenas.Arena;
@@ -74,7 +75,7 @@ public class Match
     public void endMatch()
     {
         if (battleId != null) {
-            PokemonBattle battle = Cobblemon.INSTANCE.getBattleRegistry().getBattle(battleId);
+            PokemonBattle battle = BattleRegistry.getBattle(battleId);
             if (battle != null) {
                 battle.end();
             }

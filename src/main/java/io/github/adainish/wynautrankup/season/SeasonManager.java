@@ -139,7 +139,7 @@ public class SeasonManager
         if (isValidSeason(newSeason) && getSeasonById(newSeason.getName()) == null) {
             seasons.add(newSeason);
             File file = new File(configDir, newSeason.getName() + ".json");
-            try (java.io.FileWriter writer = new FileWriter(file)) {
+            try (FileWriter writer = new FileWriter(file)) {
                 new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(newSeason, writer);
             } catch (Exception e) {
                 e.printStackTrace();

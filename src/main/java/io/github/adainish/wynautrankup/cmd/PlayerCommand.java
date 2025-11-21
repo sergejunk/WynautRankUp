@@ -16,10 +16,9 @@
  */
 package io.github.adainish.wynautrankup.cmd;
 
-import com.cobblemon.mod.common.Cobblemon;
+import com.cobblemon.mod.common.battles.BattleRegistry;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.adainish.wynautrankup.WynautRankUp;
 import io.github.adainish.wynautrankup.gui.BannedPokemonGUI;
 import io.github.adainish.wynautrankup.gui.LeaderboardGUI;
@@ -154,7 +153,7 @@ public class PlayerCommand {
                         return 1;
                     }
 
-                    if (Cobblemon.INSTANCE.getBattleRegistry().getBattleByParticipatingPlayerId(player.getUUID()) != null) {
+                    if (BattleRegistry.getBattleByParticipatingPlayerId(player.getUUID()) != null) {
                         source.sendSystemMessage(Component.literal("You are currently in a battle and cannot join the ranked queue.").withStyle(ChatFormatting.RED));
                         return 1;
                     }

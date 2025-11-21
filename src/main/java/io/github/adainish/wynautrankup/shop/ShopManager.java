@@ -17,7 +17,6 @@
 package io.github.adainish.wynautrankup.shop;
 
 import ca.landonjw.gooeylibs2.api.button.Button;
-import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -25,14 +24,9 @@ import io.github.adainish.wynautrankup.WynautRankUp;
 import io.github.adainish.wynautrankup.season.Messenger;
 import io.github.adainish.wynautrankup.util.ItemStackAdapter;
 import io.github.adainish.wynautrankup.util.PermissionUtil;
-import io.github.adainish.wynautrankup.util.TextUtil;
-import io.github.adainish.wynautrankup.util.Util;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ItemLore;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
