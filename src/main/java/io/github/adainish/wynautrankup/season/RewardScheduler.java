@@ -18,45 +18,110 @@ package io.github.adainish.wynautrankup.season;
 
 import io.github.adainish.wynautrankup.WynautRankUp;
 import io.github.adainish.wynautrankup.database.PlayerDataManager;
+import io.github.adainish.wynautrankup.util.AsyncExecutor;
 
 import java.time.LocalDate;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 
 public class RewardScheduler
 {
-    public RewardScheduler() { }
+    private final ScheduledExecutorService scheduler;
+    private final AsyncExecutor asyncExecutor;
+    private final boolean manageExecutorLifecycle;
+
+    public RewardScheduler() {
+        this(new AsyncExecutor(2), true);
+    }
+
+    public RewardScheduler(AsyncExecutor asyncExecutor) {
+        this(asyncExecutor, false);
+    }
+
+    public RewardScheduler(AsyncExecutor asyncExecutor, boolean manageExecutorLifecycle) {
+        this.asyncExecutor = asyncExecutor;
+        this.manageExecutorLifecycle = manageExecutorLifecycle;
+        // single daemon thread for scheduling
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "wynautrankup-reward-scheduler");
+            t.setDaemon(true);
+            return t;
+        });
+    }
 
     public void start() {
         SeasonManager seasonManager = WynautRankUp.instance.seasonManager;
         PlayerDataManager playerManager = WynautRankUp.instance.playerDataManager;
-        Timer timer = new Timer(true);
+        Executor executor = asyncExecutor.getExecutorService();
 
         // Daily evaluation: enqueue all rewards (offline/online unified)
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
                 LocalDate today = LocalDate.now();
                 seasonManager.getSeasons().forEach(season -> {
-                    if (season.isRewardDay(today)) {
-                        playerManager.evaluateAndDistributeRewards(season).exceptionally(ex -> {
+                    try {
+                        CompletableFuture.supplyAsync(() -> {
+                            try {
+                                // Ensure the internal future is awaited on the provided executor so default pools are not used.
+                                playerManager.evaluateAndDistributeRewards(season)
+                                        .exceptionally(ex -> { ex.printStackTrace(); return null; })
+                                        .join();
+                            } catch (RejectedExecutionException rex) {
+                                // executor inside PlayerDataManager is shutdown; log and skip this run
+                                rex.printStackTrace();
+                            } catch (Throwable t) {
+                                t.printStackTrace();
+                            }
+                            return null;
+                        }, executor).exceptionally(ex -> {
                             ex.printStackTrace();
                             return null;
                         });
+                    } catch (RejectedExecutionException rex) {
+                        // executor inside PlayerDataManager is shutdown; log and skip this run
+                        rex.printStackTrace();
                     }
                 });
+            } catch (RejectedExecutionException rex) {
+                rex.printStackTrace();
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-        }, 0, 24L * 60L * 60L * 1000L);
+        }, 0, 24L * 60L * 60L * 1000L, TimeUnit.MILLISECONDS);
 
         // Frequent dispatcher: deliver pending rewards to online players
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                playerManager.dispatchPendingRewardsToOnlinePlayers().exceptionally(ex -> {
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                CompletableFuture.supplyAsync(() -> {
+                    try {
+                        playerManager.dispatchPendingRewardsToOnlinePlayers()
+                                .exceptionally(ex -> { ex.printStackTrace(); return 0; })
+                                .join();
+                    } catch (RejectedExecutionException rex) {
+                        // executor inside PlayerDataManager is shutdown; log and skip this run
+                        rex.printStackTrace();
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                    return null;
+                }, executor).exceptionally(ex -> {
                     ex.printStackTrace();
-                    return 0;
+                    return null;
                 });
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-        }, 10_000L, 30_000L); // start after 10s, then every 30s
+        }, 10_000L, 30_000L, TimeUnit.MILLISECONDS);
+    }
+
+    public void stop() {
+        scheduler.shutdownNow();
+        if (manageExecutorLifecycle) {
+            asyncExecutor.shutdownExecutor();
+        }
     }
 }

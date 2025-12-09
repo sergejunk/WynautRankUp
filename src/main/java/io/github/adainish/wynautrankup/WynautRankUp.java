@@ -137,6 +137,7 @@ public class WynautRankUp implements ModInitializer {
         matchmakingQueue.getRankedBattleTracker().clearRankedBattles();
         databaseManager.closeDatabase();
         asyncExecutor.shutdownExecutor();
+        rewardScheduler.stop();
     }
 
     public void reloadConfig() {

@@ -52,15 +52,11 @@ public class Util
         return WynautRankUp.instance.server.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(enchantmentResourceKey);
     }
     public static List<String> formattedArrayList(List<String> list) {
-
         return list.stream().map(Util::formattedString).collect(Collectors.toList());
     }
 
     public static List<Component> formattedComponentList(List<String> s) {
-        List<Component> list = new ArrayList<>();
-        for (String str : s)
-            list.add(Component.literal(formattedString(str)));
-        return list;
+        return s.stream().map(str -> Component.literal(formattedString(str))).collect(Collectors.toList());
     }
 
     public static GooeyButton filler() {
