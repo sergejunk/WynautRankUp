@@ -32,11 +32,12 @@ public class BannedPokemonRule {
     public Set<String> moves = new HashSet<>();
     public String ability = "";
     public String heldItem = "";
+    public String aspect = "";
 
-    public BannedPokemonRule()
-    {
+    public BannedPokemonRule() {
 
     }
+
     public BannedPokemonRule(String species, String form, String ability, String heldItem, Set<String> moves) {
         this.species = species;
         this.form = form;
@@ -93,19 +94,34 @@ public class BannedPokemonRule {
                         errors.add("Warning: empty value for 'moves' in rule: '" + ruleStr + "'");
                         break;
                     }
+
+                    if (rule.species == null || rule.species.isEmpty()) {
+                        rule.moves.add(value);
+                        break;
+                    }
+
                     species = PokemonSpecies.getByIdentifier(ResourceLocation.parse("cobblemon:" + rule.species));
                     if (species == null) {
                         errors.add("Species must be defined before moves in rule: '" + ruleStr + "'");
                         break;
                     }
-                    boolean canLearn = species.getMoves().getTmMoves().stream().anyMatch(m -> m.getName().equalsIgnoreCase(value)) ||
-                            species.getMoves().getLevelUpMovesUpTo(100).stream().anyMatch(m -> m.getName().equalsIgnoreCase(value)) ||
-                            species.getMoves().getEggMoves().stream().anyMatch(m -> m.getName().equalsIgnoreCase(value)) ||
-                            species.getMoves().getTutorMoves().stream().anyMatch(m -> m.getName().equalsIgnoreCase(value));
+
+                    boolean canLearn = species.getMoves().getTmMoves().stream()
+                            .anyMatch(m -> m.getName().equalsIgnoreCase(value)) ||
+                            species.getMoves().getLevelUpMovesUpTo(100).stream()
+                                    .anyMatch(m -> m.getName().equalsIgnoreCase(value))
+                            ||
+                            species.getMoves().getEggMoves().stream().anyMatch(m -> m.getName().equalsIgnoreCase(value))
+                            ||
+                            species.getMoves().getTutorMoves().stream()
+                                    .anyMatch(m -> m.getName().equalsIgnoreCase(value));
+
                     if (!canLearn) {
-                        errors.add("Species '" + rule.species + "' cannot learn move: '" + value + "' in rule: '" + ruleStr + "'");
+                        errors.add("Species '" + rule.species + "' cannot learn move: '" + value + "' in rule: '"
+                                + ruleStr + "'");
                         break;
                     }
+
                     rule.moves.add(value);
                     break;
                 case "ability":
@@ -113,10 +129,17 @@ public class BannedPokemonRule {
                         errors.add("Warning: empty value for 'ability' in rule: '" + ruleStr + "'");
                         break;
                     }
+                    
+                    if (rule.species == null || rule.species.isEmpty()) {
+                        rule.ability = value;
+                        break;
+                    }
+
                     if (species == null) {
                         errors.add("Species must be defined before ability in rule: '" + ruleStr + "'");
                         break;
                     }
+
                     AtomicBoolean hasAbility = new AtomicBoolean(false);
                     species.getAbilities().forEach(abilityData -> {
                         if (abilityData.getTemplate().getName().equalsIgnoreCase(value)) {
@@ -140,16 +163,30 @@ public class BannedPokemonRule {
                     }
                     rule.heldItem = value;
                     break;
+                case "aspect":
+                    if (value.isEmpty()) {
+                        errors.add("Warning: empty value for 'aspect' in rule: '" + ruleStr + "'");
+                        break;
+                    }
+                    rule.aspect = value;
+                    break;
                 default:
-                    errors.add("Unrecognized key: '" + key + "' with value: '" + value + "' in rule: '" + ruleStr + "'");
+                    errors.add(
+                            "Unrecognized key: '" + key + "' with value: '" + value + "' in rule: '" + ruleStr + "'");
                     break;
             }
         }
-        if (rule.species == null || rule.species.isEmpty())
-            errors.add("Missing or empty species in rule: '" + ruleStr + "'");
+        boolean hasAnyCondition = (rule.species != null && !rule.species.isEmpty()) ||
+                (rule.form != null && !rule.form.isEmpty()) ||
+                (rule.ability != null && !rule.ability.isEmpty()) ||
+                (rule.heldItem != null && !rule.heldItem.isEmpty()) ||
+                (rule.aspect != null && !rule.aspect.isEmpty()) ||
+                (rule.moves != null && !rule.moves.isEmpty());
+
+        if (!hasAnyCondition) {
+            errors.add("Rule has no conditions: '" + ruleStr + "'");
+        }
         return rule;
     }
-
-
 
 }
